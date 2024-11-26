@@ -11,3 +11,4 @@ backend/uploads/
 
 *.tmp
 *.bak
+.DS_Store
