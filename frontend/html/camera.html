@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>街景評価</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <header>
+        <div class="icon-container" onclick="showPostCount()">
+            <img src="../icon/setting.png" alt="Icon" class="icon-setting">
+        </div>
+    </header>
+    
+    <main>
+        <div class="camera-container">
+            <video id="video" autoplay playsinline></video>
+            <img id="photo" src="" alt="写真プレビュー" style="display: none;">
+        </div>
+        <div class="tag-section">
+            <div class="tag-category">
+                <h4>注目タグ</h4>
+                <div class="text-tags">
+                    <button class="tag-text" onclick="toggleTag(this, '風景')">風景</button>
+                    <button class="tag-text" onclick="toggleTag(this, '看板')">看板</button>
+                    <button class="tag-text" onclick="toggleTag(this, '人混み')">人混み</button>
+                    <button class="tag-text" onclick="toggleTag(this, '城')">城</button>
+                    <button class="tag-text" onclick="toggleTag(this, 'ゴミ')">ゴミ</button>
+                    <button class="tag-text" onclick="toggleTag(this, 'その他')">その他</button>
+                </div>
+            </div>
+            <div class="tag-category">
+                <h4>音</h4>
+                <div class="text-tags">
+                    <button class="tag-text" onclick="toggleTag(this, '車両')">車両</button>
+                    <button class="tag-text" onclick="toggleTag(this, '雑踏')">雑踏</button>
+                    <button class="tag-text" onclick="toggleTag(this, '生活音')">生活音</button>
+                    <button class="tag-text" onclick="toggleTag(this, '無音')">無音</button>
+                    <button class="tag-text" onclick="toggleTag(this, 'その他')">その他</button>
+                </div>
+            </div>
+            <div class="tag-category">
+                <h4>匂い</h4>
+                <div class="text-tags">
+                    <button class="tag-text" onclick="toggleTag(this, '食事系')">食事系</button>
+                    <button class="tag-text" onclick="toggleTag(this, 'スイーツ系')">スイーツ系</button>
+                    <button class="tag-text" onclick="toggleTag(this, '花木')">花木</button>
+                    <button class="tag-text" onclick="toggleTag(this, '無臭')">無臭</button>
+                    <button class="tag-text" onclick="toggleTag(this, 'その他')">その他</button>
+                </div>
+            </div>
+            <div class="tag-category">
+                <h4>天気</h4>
+                <div class="text-tags">
+                    <button class="tag-text" onclick="toggleTag(this, '晴れ')">晴れ</button>
+                    <button class="tag-text" onclick="toggleTag(this, '雪')">雪</button>
+                    <button class="tag-text" onclick="toggleTag(this, '雨')">雨</button>
+                    <button class="tag-text" onclick="toggleTag(this, '風')">風</button>
+                    <button class="tag-text" onclick="toggleTag(this, 'その他')">その他</button>
+                </div>
+            </div>
+            <div class="tag-category">
+                <h4>気持ち</h4>
+                <div class="text-tags">
+                    <button class="tag-text" onclick="toggleTag(this, '心地良い')">心地良い</button>
+                    <button class="tag-text" onclick="toggleTag(this, 'ドキドキ')">ドキドキ</button>
+                    <button class="tag-text" onclick="toggleTag(this, 'ワクワク')">ワクワク</button>
+                    <button class="tag-text" onclick="toggleTag(this, '嬉しい')">嬉しい</button>
+                    <button class="tag-text" onclick="toggleTag(this, '悲しい')">悲しい</button>
+                    <button class="tag-text" onclick="toggleTag(this, '驚き')">驚き</button>
+                    <button class="tag-text" onclick="toggleTag(this, '怒り')">怒り</button>
+                    <button class="tag-text" onclick="toggleTag(this, 'その他')">その他</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="comment-section">
+            <h3>コメント:</h3>
+            <textarea id="comment" placeholder="コメントを入力してください..."></textarea>
+        </div>
+        <div class="submit-section">
+            <button id="captureButton">撮影する</button>
+            <button id="submitButton">送信</button>
+        </div>
+    </main>
+    <script>
+        let video = document.getElementById('video');
+        let photo = document.getElementById('photo');
+        let captureButton = document.getElementById('captureButton');
+        let submitButton = document.getElementById('submitButton');
+        let selectedTags = []; 
+
+        function getEmailFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            const email = params.get('email');
+            return email ? email : '未入力'; 
+        }
+
+        function showPostCount() {
+            const email = getEmailFromURL();
+            const postCount = 0; 
+            alert(`メールアドレス: ${email}\nあなたのPOST数: ${postCount}`);
+        }
+
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+            } catch (error) {
+                alert('カメラを起動できません: ' + error.message);
+            }
+        }
+
+        // タグを切り替える（选択/解除）
+        function toggleTag(element, tag) {
+            if (selectedTags.includes(tag)) {
+                // 既に選択されている場合は解除
+                selectedTags = selectedTags.filter(t => t !== tag);
+                element.classList.remove('selected');
+            } else {
+                // 選択状態にする
+                selectedTags.push(tag);
+                element.classList.add('selected');
+            }
+        }
+
+        // 写真を撮影する
+        captureButton.addEventListener('click', () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            const photoData = canvas.toDataURL('image/png');
+            photo.src = photoData;
+            photo.style.display = 'block'; // プレビューを表示
+        });
+
+        // データを送信する
+        submitButton.addEventListener('click', () => {
+            const comment = document.getElementById('comment').value;
+
+            // 撮影したかを確認
+            if (!photo.src || photo.src === '' || !photo.src.startsWith('data:image/png;base64,')) {
+                alert('写真を撮影してください。');
+                document.querySelector('.camera-container').style.border = '2px solid red';
+                return;
+            } else {
+                document.querySelector('.camera-container').style.border = 'none';
+            }
+
+            // 少なくとも1つタグを選択したかを確認
+            if (selectedTags.length === 0) {
+                alert('少なくとも1つの評価タグを選択してください。');
+                document.querySelector('.tag-section').style.border = '2px solid red';
+                return;
+            } else {
+                 document.querySelector('.tag-section').style.border = 'none';
+            }
+
+            // 保存するデータ
+            const data = {
+                tags: selectedTags, 
+                comment: comment || '', 
+                photo: photo.src, 
+            };
+
+            fetch('/upload', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert('データが正常に送信されました！');
+                    } else {
+                        throw new Error('送信に失敗しました');
+                    }
+                })
+                .catch(error => {
+                    console.error('送信エラー:', error);
+                    alert('データ送信中にエラーが発生しました。');
+                });
+        });
+
+
+        // ページ読み込み時にカメラを起動
+        startCamera();
+    </script>
+</body>
+</html>

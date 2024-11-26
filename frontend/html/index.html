@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ログイン</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <!-- モーダル内容 -->
+    <div id="consentModal" class="modal">
+        <div id="modalContent" class="modal-content">
+            <p>ご協力いただいたデータは、研究目的のみに使用され、ご本人の同意なしに第三者へ情報を提供することは一切ありません。収集したデータは匿名化され、個人を特定できる形で公表されることはありません。</p>
+            <button id="consentButton" class="button">同意する</button>
+        </div>
+    </div>
+
+    <!-- メインコンテンツ -->
+    <div class="container">
+        <header class="header">
+            <h1 class="title">ログイン</h1>
+        </header>
+        <main>
+            <div id="inputForm" class="form-container">
+                <form id="experimentForm" action="camera.html" method="GET">
+                    <label for="email">メールアドレス:</label>
+                    <input type="email" id="email" name="email" placeholder="メールアドレスを入力" required>
+                
+                    <label for="password">パスワード:</label>
+                    <input type="text" id="password" name="password" placeholder="パスワードを入力" required>
+                
+                    <button type="submit" class="button">次へ</button>
+                </form> 
+            </div>
+        </main>
+    </div>
+    <script src="../js/app.js"></script>
+</body>
+</html>
